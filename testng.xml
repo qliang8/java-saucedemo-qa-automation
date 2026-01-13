@@ -1,6 +1,23 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
-<suite name="SauceDemo QA Automation Suite">
-    <test name="UI Tests">
+<suite name="SauceDemo Test Suite">
+    <test name="Smoke Only">
+        <groups>
+            <run>
+                <include name="smoke"/>
+            </run>
+        </groups>
+        <packages>
+            <package name="com.saucedemo.test"/>
+        </packages>
+    </test>
+    <test name="Smoke and Regression Test">
+        <groups>
+            <run>
+                <include name="smoke"/>
+                <include name="regression"/>
+                <exclude name="performance"/>
+            </run>
+        </groups>
         <packages>
             <package name="com.saucedemo.test"/>
         </packages>

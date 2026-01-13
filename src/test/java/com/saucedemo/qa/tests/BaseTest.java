@@ -9,6 +9,7 @@ public class BaseTest {
 
     protected WebDriver driver;
 
+    // Init a driver every test method
     @BeforeMethod
     public void setUp() {
         DriverFactory.initDriver();
@@ -16,6 +17,7 @@ public class BaseTest {
         driver.get("https://www.saucedemo.com/");
     }
 
+    // Tear down the driver after the test
     @AfterMethod
     public void tearDown() {
         DriverFactory.quitDriver();

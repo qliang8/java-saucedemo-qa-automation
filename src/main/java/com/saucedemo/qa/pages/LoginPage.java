@@ -47,4 +47,12 @@ public class LoginPage {
             return "";
         }
     }
+
+    public boolean isLoginButtonDisplayed(){
+        try {
+            return loginButton.isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

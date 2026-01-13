@@ -7,15 +7,15 @@ import org.testng.annotations.Test;
 
 public class LoginTest extends BaseTest {
 
-    @Test(groups = {"functional", "regression"})
+    @Test(groups = {"smoke", "regression", "functional"})
     public void validLoginTest() {
         LoginPage loginPage = new LoginPage(driver);
         loginPage.login("standard_user", "secret_sauce");
-        Assert.assertTrue(driver.getCurrentUrl().contains("inventory.html"));
+
+        Assert.assertTrue(driver.getCurrentUrl().contains("inventory.html"), "Login failed");
     }
 
-    // Performance + Regression
-    @Test(groups = {"performance", "regression"})
+    @Test(groups = {"regression", "performance"})
     public void loginPerformanceTest() {
         LoginPage loginPage = new LoginPage(driver);
         InventoryPage inventoryPage = new InventoryPage(driver);
@@ -28,7 +28,7 @@ public class LoginTest extends BaseTest {
         Assert.assertTrue(duration <= 2000, "Login time is larger than 2000ms for standard_user");
     }
 
-    @Test(groups = {"functional", "regression"})
+    @Test(groups = {"regression", "functional"})
     public void emptyUsernameLoginTest() {
         LoginPage loginPage = new LoginPage(driver);
         loginPage.login("", "");
@@ -36,7 +36,7 @@ public class LoginTest extends BaseTest {
         Assert.assertTrue(errorMsg.contains("Epic sadface: Username is required"));
     }
 
-    @Test(groups = {"functional", "regression"})
+    @Test(groups = {"regression", "functional"})
     public void emptyPasswordLoginTest() {
         LoginPage loginPage = new LoginPage(driver);
         loginPage.login("standard_user", "");
@@ -44,7 +44,7 @@ public class LoginTest extends BaseTest {
         Assert.assertTrue(errorMsg.contains("Epic sadface: Password is required"));
     }
 
-    @Test(groups = {"functional", "regression"})
+    @Test(groups = {"regression", "functional"})
     public void invalidLoginTest() {
         LoginPage loginPage = new LoginPage(driver);
         loginPage.login("standard_user", "wrong_password");
@@ -52,7 +52,7 @@ public class LoginTest extends BaseTest {
         Assert.assertTrue(errorMsg.contains("Epic sadface: Username and password do not match any user in this service"));
     }
 
-    @Test(groups = {"functional", "regression"})
+    @Test(groups = {"regression", "functional"})
     public void lockedOutUserLoginTest() {
         LoginPage loginPage = new LoginPage(driver);
         loginPage.login("locked_out_user", "secret_sauce");
