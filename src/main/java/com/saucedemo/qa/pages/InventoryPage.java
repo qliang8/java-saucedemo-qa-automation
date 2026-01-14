@@ -90,16 +90,12 @@ public class InventoryPage {
     }
 
     public void logout(){
-        // 1️⃣ Click menu button
         wait.until(ExpectedConditions.elementToBeClickable(openMenuButton)).click();
 
-        // 2️⃣ Wait for menu animation to finish
         wait.until(ExpectedConditions.attributeContains(menuWrapper, "aria-hidden", "false"));
 
-        // 4️⃣ Scroll into view (optional, prevents overlay issues)
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", logoutLink);
 
-        // 5️⃣ Click logout
         wait.until(ExpectedConditions.elementToBeClickable(logoutLink)).click();
     }
 }
