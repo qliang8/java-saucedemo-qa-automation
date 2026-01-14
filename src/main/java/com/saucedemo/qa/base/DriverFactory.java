@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class DriverFactory {
 
-    private static ThreadLocal<WebDriver> driver = new ThreadLocal<>();
+    private static final ThreadLocal<WebDriver> driver = new ThreadLocal<>();
 
     public static void initDriver() {
         WebDriverManager.chromedriver().setup();
@@ -22,12 +22,12 @@ public class DriverFactory {
         prefs.put("profile.password_manager_enabled", false);
         options.setExperimentalOption("prefs", prefs);
 
-        //options.addArguments("--headless=new");
-        //options.addArguments("--disable-gpu");
-        //options.addArguments("--disable-notifications");
-        //options.addArguments("--window-size=1920,1080");
+        options.addArguments("--headless=new");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--disable-notifications");
+        options.addArguments("--window-size=1920,1080");
 
-        driver.set(new ChromeDriver(options));
+        driver.set(new ChromeDriver());
         driver.get().manage().window().maximize();
     }
 
