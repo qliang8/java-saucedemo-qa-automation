@@ -22,14 +22,22 @@ public class DriverFactory {
         prefs.put("profile.password_manager_enabled", false);
         options.setExperimentalOption("prefs", prefs);
 
-        options.addArguments("--headless=new");
+        // CI flags
+        if (System.getenv("CI") != null) {
+            options.addArguments("--headless=new");
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
+        }
         options.addArguments("--disable-gpu");
         options.addArguments("--disable-notifications");
         options.addArguments("--window-size=1920,1080");
 
-        driver.set(new ChromeDriver());
-        driver.get().manage().window().maximize();
+        driver.set(new ChromeDriver(options));
+
+        WebDriver webDriver = driver.get();
+        webDriver.manage().deleteAllCookies();
     }
+
 
     public static WebDriver getDriver() {
         return driver.get();
