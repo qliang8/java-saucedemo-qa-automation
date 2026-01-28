@@ -1,80 +1,74 @@
 package com.saucedemo.qa.tests;
 
+import com.saucedemo.qa.base.BaseTest;
 import com.saucedemo.qa.pages.InventoryPage;
 import com.saucedemo.qa.pages.LoginPage;
-import org.openqa.selenium.By;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.time.Duration;
 
-public class InventoryTest extends BaseTest{
+public class InventoryTest extends BaseTest {
 
-    private LoginPage loginPage;
     private InventoryPage inventoryPage;
 
     @BeforeMethod(alwaysRun = true)
     public void setUpTest() {
-        loginPage = new LoginPage(driver);
-        inventoryPage = new InventoryPage(driver);
+        LoginPage loginPage = new LoginPage(driver);
+        inventoryPage = loginPage.login("standard_user", "secret_sauce");
     }
 
     @Test(groups = {"smoke", "regression", "functional"})
     public void inventoryPageLoadTest() {
-        loginPage.login("standard_user", "secret_sauce");
-
-        Assert.assertTrue(inventoryPage.isInventoryContainerVisible(),"Inventory page did not load successfully");
+        Assert.assertTrue(inventoryPage.isInventoryContainerVisible(),"Inventory page load failed");
     }
 
     @Test(groups = {"smoke", "regression", "functional"})
-    public void productDisplayTest() {
-        loginPage.login("standard_user", "secret_sauce");
-
-        Assert.assertFalse(inventoryPage.getProductNames().isEmpty(), "Product did not display");
+    public void addFirstItemTest() {
+        inventoryPage.waitForPageLoad();
+        inventoryPage.addItemByName("Sauce Labs Backpack");
+        Assert.assertEquals(inventoryPage.getCartCount(), 1, "Cart item is not 1 after adding first product");
     }
 
     @Test(groups = {"smoke", "regression", "functional"})
-    public void addFirstProductTest() {
-        loginPage.login("standard_user", "secret_sauce");
+    public void addMultipleItemsTest() throws InterruptedException {
+        inventoryPage.waitForPageLoad();
+        inventoryPage.addItemByName("Sauce Labs Backpack");
+        inventoryPage.addItemByName("Sauce Labs Bike Light");
+        inventoryPage.addItemByName("Sauce Labs Bolt T-Shirt");
 
-        inventoryPage.addFirstProductToCart();
-        Assert.assertEquals(inventoryPage.getCartItemCount(), 1, "Cart item is not 1 after adding first product");
+        Assert.assertEquals(inventoryPage.getCartCount(), 3, "Cart item is not 3 after adding 3 items");
+
+        inventoryPage.removeItemByName("Sauce Labs Backpack");
+        inventoryPage.removeItemByName("Sauce Labs Bike Light");
+        inventoryPage.removeItemByName("Sauce Labs Bolt T-Shirt");
     }
 
     @Test(groups = {"smoke", "regression", "functional"})
-    public void addMultipleProductsTest() {
-        loginPage.login("standard_user", "secret_sauce");
+    public void removeItemTest() {
+        inventoryPage.waitForPageLoad();
+        inventoryPage.addItemByName("Sauce Labs Backpack");
+        inventoryPage.addItemByName("Sauce Labs Bike Light");
+        Assert.assertEquals(inventoryPage.getCartCount(), 2, "Added item does not match with the Cart");
 
-        inventoryPage.addProductToCartByIndex(0);
-        inventoryPage.addProductToCartByIndex(1);
-        inventoryPage.addProductToCartByIndex(2);
-        Assert.assertEquals(inventoryPage.getCartItemCount(), 3, "Cart item is not 3 after adding 3 items");
+        inventoryPage.removeItemByName("Sauce Labs Backpack");
+        Assert.assertEquals(inventoryPage.getCartCount(), 1, "Item does not remove");
+
+        inventoryPage.removeItemByName("Sauce Labs Bike Light");
+        Assert.assertEquals(inventoryPage.getCartCount(), 0, "Item does not remove");
     }
 
     @Test(groups = {"smoke", "regression", "functional"})
     public void navigateToCartTest() {
-        loginPage.login("standard_user", "secret_sauce");
-
         inventoryPage.goToCart();
         Assert.assertTrue(driver.getCurrentUrl().contains("cart.html"), "Direct to cart page failed");
     }
 
-////    @Test(groups = {"smoke", "regression", "functional"})
-////    public void logoutTest() {
-////        LoginPage loginPage = new LoginPage(driver);
-////        loginPage.login("standard_user", "secret_sauce");
-////
-////        InventoryPage inventoryPage = new InventoryPage(driver);
-////        inventoryPage.waitForPageLoad();
-////
-////        inventoryPage.logout();
-////
-////        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-////        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("login-button")));
-////
-////        Assert.assertTrue(loginPage.isLoginButtonDisplayed(), "Logout failed: Login page not displayed");
-////    }
+    @Test(groups = {"smoke", "regression", "functional"})
+    public void logoutTest() {
+        inventoryPage.waitForPageLoad();
+        LoginPage loginPage = inventoryPage.logout();
+
+        Assert.assertTrue(loginPage.isLoginButtonDisplayed(), "Logout failed: Login page not displayed");
+    }
 }

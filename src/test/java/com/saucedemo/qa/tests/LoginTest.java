@@ -1,5 +1,6 @@
 package com.saucedemo.qa.tests;
 
+import com.saucedemo.qa.base.BaseTest;
 import com.saucedemo.qa.pages.InventoryPage;
 import com.saucedemo.qa.pages.LoginPage;
 import org.testng.Assert;
@@ -17,19 +18,20 @@ public class LoginTest extends BaseTest {
 
     @Test(groups = {"smoke", "regression", "functional"})
     public void validLoginTest() {
-        loginPage.login("standard_user", "secret_sauce");
-
-        Assert.assertTrue(driver.getCurrentUrl().contains("inventory.html"), "Login failed");
+        InventoryPage inventoryPage = loginPage.login("standard_user", "secret_sauce");
+        Assert.assertTrue(inventoryPage.isLoaded(),"Login failed");
+        //Assert.assertTrue(driver.getCurrentUrl().contains("inventory.html"), "Login failed");
     }
 
     @Test(groups = {"regression", "performance"})
     public void loginPerformanceTest() {
 
         long start = System.currentTimeMillis();
-        loginPage.login("standard_user", "secret_sauce");
 
-        InventoryPage inventoryPage = new InventoryPage(driver);
+        InventoryPage inventoryPage = loginPage.login("standard_user", "secret_sauce");
+
         inventoryPage.waitForPageLoad();
+
         long duration = System.currentTimeMillis() - start;
 
         Assert.assertTrue(duration <= 2000, "Login time is larger than 2000ms for standard_user");
@@ -37,29 +39,33 @@ public class LoginTest extends BaseTest {
 
     @Test(groups = {"regression", "functional"})
     public void emptyUsernameLoginTest() {
-        loginPage.login("", "");
-        String errorMsg = loginPage.getErrorMessage();
+        LoginPage failedLogin = loginPage.loginExpectingFailure("", "");
+        String errorMsg = failedLogin.getErrorMessage();
+
         Assert.assertTrue(errorMsg.contains("Epic sadface: Username is required"));
     }
 
     @Test(groups = {"regression", "functional"})
     public void emptyPasswordLoginTest() {
-        loginPage.login("standard_user", "");
-        String errorMsg = loginPage.getErrorMessage();
+        LoginPage failedLogin = loginPage.loginExpectingFailure("standard_user", "");
+        String errorMsg = failedLogin.getErrorMessage();
+
         Assert.assertTrue(errorMsg.contains("Epic sadface: Password is required"));
     }
 
     @Test(groups = {"regression", "functional"})
     public void invalidLoginTest() {
-        loginPage.login("standard_user", "wrong_password");
-        String errorMsg = loginPage.getErrorMessage();
+        LoginPage failedLogin = loginPage.loginExpectingFailure("standard_user", "wrong_password");
+        String errorMsg = failedLogin.getErrorMessage();
+
         Assert.assertTrue(errorMsg.contains("Epic sadface: Username and password do not match any user in this service"));
     }
 
     @Test(groups = {"regression", "functional"})
     public void lockedOutUserLoginTest() {
-        loginPage.login("locked_out_user", "secret_sauce");
-        String errorMsg = loginPage.getErrorMessage();
+        LoginPage failedLogin = loginPage.loginExpectingFailure("locked_out_user", "secret_sauce");
+        String errorMsg = failedLogin.getErrorMessage();
+
         Assert.assertTrue(errorMsg.contains("Epic sadface: Sorry, this user has been locked out."));
     }
 }

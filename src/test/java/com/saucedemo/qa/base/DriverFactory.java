@@ -12,34 +12,34 @@ public class DriverFactory {
 
     private static final ThreadLocal<WebDriver> driver = new ThreadLocal<>();
 
-    public static void initDriver() {
-        WebDriverManager.chromedriver().setup();
 
+    private static WebDriver initDriver() {
         ChromeOptions options = new ChromeOptions();
 
         Map<String, Object> prefs = new HashMap<>();
         prefs.put("credentials_enable_service", false);
         prefs.put("profile.password_manager_enabled", false);
+        prefs.put("profile.password_manager_leak_detection", false);
         options.setExperimentalOption("prefs", prefs);
 
-        // CI flags
-        if (System.getenv("CI") != null) {
-            options.addArguments("--headless=new");
-            options.addArguments("--no-sandbox");
-            options.addArguments("--disable-dev-shm-usage");
-        }
-        options.addArguments("--disable-gpu");
         options.addArguments("--disable-notifications");
+        options.addArguments("--disable-infobars");
+        options.addArguments("--disable-features=PasswordLeakDetection");
+
+
+        options.addArguments("user-data-dir=C:/selenium/chrome-profile");
+
+        // headless CI option
+        options.addArguments("--headless=new");
         options.addArguments("--window-size=1920,1080");
 
-        driver.set(new ChromeDriver(options));
-
-        WebDriver webDriver = driver.get();
-        webDriver.manage().deleteAllCookies();
+        return new ChromeDriver(options);
     }
 
-
     public static WebDriver getDriver() {
+        if (driver.get() == null) {
+            driver.set(initDriver());
+        }
         return driver.get();
     }
 
